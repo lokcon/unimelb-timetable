@@ -1,3 +1,11 @@
+CAMPUSES = {
+    "U"  : "Parkville",
+    "BUR": "Burnley",
+    "CRE": "Creswick",
+    "DOO": "Dookie",
+    "STH": "Southbank"
+}
+
 CLASS_TYPES = {
     "C" : "Concert Class",
     "CL": "Clinical Laboratory",
@@ -40,5 +48,6 @@ STUDY_PERIODS = {
 }
 
 '''A scraper for the timetable of a subject'''
-class Timetale
-    def __init__()
+class Timetale:
+    def __init__():
+        pass
