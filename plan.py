@@ -7,7 +7,7 @@ def choose_study_period(subject_code, subject_classes):
     """
 
     # Prompt the user
-    print("[%s] has the following study periods:" % subject_code.upper())
+    print("%s has the following study periods:" % subject_code.upper())
 
     options_dict = {}
     for count, study_period in enumerate(sorted(subject_classes.keys()), 1):
@@ -24,20 +24,23 @@ def choose_study_period(subject_code, subject_classes):
     options_str = options_str[:-1]
 
     # Ask the user
-    print("Enter a num [%s]" % options_str)
+    import sys
+    sys.stdout.write("Chose a study period [%s]: " % options_str)
     try:
         choosen_num = int(raw_input())
     except ValueError:
         choosen_num = 1
     else:
         if choosen_num not in options:
+            print("Invalid option, defaults to option 1")
             choosen_num = 1
 
     return subject_classes[options_dict[choosen_num]]
 
 
-def read_timetables(subjects, debug = False):
+def fetch_timetables(subjects, debug = False):
     if debug:
+        import json
         with open("test.json") as f:
             return json.loads(f.read())
 
@@ -51,8 +54,7 @@ def draw_timetable(subject_codes, year = None):
         year = date.today().year
 
     # Fetch timetables
-    subject_timetable = fetch_timetables(subject_codes, debug = True)
-
+    subject_timetables = fetch_timetables(subject_codes, debug = True)
 
     classes = []
     for subject_timetable in subject_timetables:
