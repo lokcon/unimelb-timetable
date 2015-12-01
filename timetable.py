@@ -1,13 +1,16 @@
 from pprint import pprint
 
+CLASS_ROW_HEADERS = ["class", "description", "day", "start", "finish",
+    "duration", "weeks", "location", "date", "start_date"]
+CLASS_CODES = ["subject", "campus", "num", "semester", "class_type",
+    "class_repeat"]
+
 'A scraper for the timetable of a subject'''
 class Timetable:
     TIMETALBE_LINK = ("https://sws.unimelb.edu.au/%(year)s/Reports/List.aspx"
         "?objects=%(subject)s&weeks=1-52&days=1-7&periods=1-56"
         "&template=module_by_group_list"
         )
-    CLASS_ROW_HEADERS = ["class", "description", "day", "start", "finish",
-        "duration", "weeks", "location", "date", "start_date"]
 
 
     def __timetable_link(self, year, subject):
@@ -29,17 +32,18 @@ class Timetable:
 
                 # Assemble the cells in the row
                 this_row = [cell.string for cell in cells]
-                class_ = dict(zip(self.CLASS_ROW_HEADERS, this_row))
+                class_ = dict(zip(CLASS_ROW_HEADERS, this_row))
 
                 # process the cells
                 class_["day"] = Weekday.from_string(class_["day"])
                 class_["start"] = Time.from_string(class_["start"])
                 class_["finish"] = Time.from_string(class_["finish"])
+                class_["class"] = dict(zip(CLASS_CODES,
+                    class_["class"].split("/")))
 
-                # group classes by study period
-                (subject, campus, num, semester, class_name, class_repeat) = \
-                    class_["class"].split("/")
-                    
+
+                # group classes by semester
+                semester = class_["class"]["semester"]
                 if semester not in classes:
                     classes[semester] = [class_]
                 else:
@@ -91,6 +95,7 @@ class Weekday:
 def main():
     timetable = Timetable()
     pprint(timetable.read_subject(2016, "comp10001"))
+    pprint(timetable.read_subject(2016, "comp10002"))
 
 
 if __name__ == "__main__":
