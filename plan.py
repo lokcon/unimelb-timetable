@@ -39,19 +39,13 @@ def choose_study_period(subject_code, subject_classes):
     return subject_classes[options_dict[choosen_num]]
 
 
-def fetch_timetables(year, subjects, debug = False, dump = False):
+def fetch_timetables(year, subjects, debug = False):
     if debug:
-        import json
-        with open("test.json") as f:
-            return json.loads(f.read())
+        import test_data
+        return test_data.timetables
 
     t = Timetable()
     timetables = [t.read_subject(year, subject) for subject in subjects]
-
-    if dump:
-        import json
-        with open("test.json", 'w') as f:
-            f.write(json.dumps(timetables))
 
     return timetables
 
@@ -74,23 +68,56 @@ def draw_timetable(subject_codes, year = None):
             [(study_period, subject_classes)] = subject_classes.items()
             classes += subject_classes
 
-    # Sort by day, start, then finish of a class
-    classes = sorted(classes,
-        key = lambda x:(x["day"], x["start"], x["finish"]))
 
+    # Calculate stacking of classes
+    classes_by_day = {} # group classes by day
     for class_ in classes:
-        class_info = class_["class"]
-        print("%s, %s, %s"
-            % (class_info["subject"], class_info["class_type"],
-            class_info["class_repeat"]))
+        classes_by_day.setdefault(class_["day"], []).append(class_)
+
+    for day, classes_that_day in classes_by_day.items(): # process each weekday
+        # construct intervals
+        intervals = []
+        for class_ in classes_that_day:
+            intervals.append(class_["start"])
+            intervals.append(class_["finish"])
+        intervals.sort()
+        intervals_count = [0] * len(intervals) # parallel counter list
+
+        # stack classes on intervals
+        for class_ in classes_that_day:
+            start_index = intervals.index(class_["start"])
+            finish_index = intervals.index(class_["finish"])
+            peak_level = max(intervals_count[start_index: finish_index])
+
+            class_["stacking"] = peak_level
+
+            # increment stakcing level on the peark
+            for index in range(start_index, finish_index):
+                if intervals_count[index] == peak_level:
+                    intervals_count[index] += 1
+
+        # retreive max stacking for each class
+        for class_ in classes_that_day:
+            start_index = intervals.index(class_["start"])
+            finish_index = intervals.index(class_["finish"])
+            class_["total_stacking"] = \
+                max(intervals_count[start_index: finish_index])
+
+
     start = min([class_["start"] for class_ in classes])
     finish = max([class_["finish"] for class_ in classes])
-
     plot(classes, start, finish)
 
 def time_to_float(time):
     (hour, minutes) = time
     return hour + minutes / 60
+
+def get_color(subject, colors):
+    COLORS = ["lightblue", "lightgreen", "salmon", "wheat", "pink"]
+    if subject not in colors:
+        colors[subject] = COLORS[len(colors)]
+
+    return colors[subject]
 
 
 def plot(classes, start, finish):
@@ -102,7 +129,7 @@ def plot(classes, start, finish):
     # Set axis
     fig = plt.figure(figsize = (10, 10))
     subplot = fig.add_subplot(1,1,1)
-    subplot.yaxis.grid()
+    subplot.yaxis.grid(which = "both")
     subplot.set_xlim(0.5, 5 + 0.5)
     subplot.set_ylim(time_to_float(finish) + TIME_MARGIN,
         time_to_float(start) - TIME_MARGIN)
@@ -110,28 +137,34 @@ def plot(classes, start, finish):
     subplot.set_xticklabels(["Monday","Tuesday","Wednesday","Thursday", "Friday"])
     subplot.set_ylabel('Time')
 
+    colors = {}
     for class_ in classes:
-        pprint(class_)
         day = class_["day"] + 1
-        (day_start, day_end) = (day - 0.5, day + 0.5)
+        day_start = (day - 0.5) + class_["stacking"] / class_["total_stacking"]
+        day_end = day_start + 1 / class_["total_stacking"]
         start = time_to_float(class_["start"])
         finish = time_to_float(class_["finish"])
 
         # Draw the square
         plt.fill_between(
-            [day_start + ITEM_MARGIN, day_end - ITEM_MARGIN],
+            [day_start, day_end - ITEM_MARGIN * 2],
              start + ITEM_MARGIN,
              finish - ITEM_MARGIN,
-            color = "lightblue",
+            color = get_color(class_["class"]["subject"], colors),
             edgecolor = "k",
             linewidth = 0.5)
         # Draw starting time
         plt.text(day_start + ITEM_MARGIN * 2,
             start + ITEM_MARGIN * 5,
-            "%d:%02d" % tuple(class_["start"]),
+            "%d:%02d" % class_["start"],
             fontsize = 8, va = "top")
+        # Draw finishing time
+        plt.text(day_start + ITEM_MARGIN * 2,
+            finish - ITEM_MARGIN * 5,
+            "%d:%02d" % class_["finish"],
+            fontsize = 8, va = "bottom")
         # Draw class name
-        plt.text(day,
+        plt.text((day_start + day_end) / 2,
             (start + finish) / 2,
             "%s/%s" % (class_["class"]["class_type"],
                 class_["class"]["class_repeat"]),
@@ -143,7 +176,7 @@ def plot(classes, start, finish):
 
 
 def main():
-    subject_codes = ["comp20003"] #, "swen20003", "info20003", "mast20026"]
+    subject_codes = ["comp20003"] #,"info20003", "mast20026"]
     draw_timetable(subject_codes)
 
 if __name__ == "__main__":
