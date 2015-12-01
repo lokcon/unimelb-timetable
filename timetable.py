@@ -11,7 +11,7 @@ class Timetable:
     """A scraper for the timetable of a subject"""
 
     def __timetable_link(self, year, subject):
-        return self.TIMETALBE_LINK % {"year": year, "subject": subject}
+        return TIMETALBE_LINK % {"year": year, "subject": subject}
 
 
     def read_subject(self, year, subject):
