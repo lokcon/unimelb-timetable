@@ -28,7 +28,7 @@ def choose_study_period(subject_code, subject_classes):
     import sys
     sys.stdout.write("Chose a study period [%s]: " % options_str)
     try:
-        choosen_num = int(raw_input())
+        choosen_num = int(input())
     except ValueError:
         choosen_num = 1
     else:
