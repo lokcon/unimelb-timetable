@@ -1,3 +1,4 @@
+from pprint import pprint
 from timetable import Timetable
 from subject_codes import STUDY_PERIODS
 
@@ -56,6 +57,7 @@ def draw_timetable(subject_codes, year = None):
     # Fetch timetables
     subject_timetables = fetch_timetables(subject_codes, debug = True)
 
+    # Flatten clases from different subjects
     classes = []
     for subject_timetable in subject_timetables:
         subject_code, subject_classes = subject_timetable
@@ -64,6 +66,16 @@ def draw_timetable(subject_codes, year = None):
         else:
             [(study_period, subject_classes)] = subject_classes.items()
             classes += subject_classes
+
+    # Sort by day, start, then finish of a class
+    classes = sorted(classes,
+        key = lambda x:(x["day"], x["start"], x["finish"]))
+
+    for class_ in classes:
+        class_info = class_["class"]
+        print("%s, %s, %s"
+            % (class_info["subject"], class_info["class_type"],
+            class_info["class_repeat"]))
 
 
 def main():
