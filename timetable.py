@@ -1,17 +1,14 @@
-from pprint import pprint
-
 CLASS_ROW_HEADERS = ["class", "description", "day", "start", "finish",
     "duration", "weeks", "location", "date", "start_date"]
 CLASS_CODES = ["subject", "campus", "num", "semester", "class_type",
     "class_repeat"]
+TIMETALBE_LINK = ("https://sws.unimelb.edu.au/%(year)s/Reports/List.aspx"
+    "?objects=%(subject)s&weeks=1-52&days=1-7&periods=1-56"
+    "&template=module_by_group_list"
+    )
 
-'A scraper for the timetable of a subject'''
 class Timetable:
-    TIMETALBE_LINK = ("https://sws.unimelb.edu.au/%(year)s/Reports/List.aspx"
-        "?objects=%(subject)s&weeks=1-52&days=1-7&periods=1-56"
-        "&template=module_by_group_list"
-        )
-
+    """A scraper for the timetable of a subject"""
 
     def __timetable_link(self, year, subject):
         return self.TIMETALBE_LINK % {"year": year, "subject": subject}
@@ -52,8 +49,9 @@ class Timetable:
         return classes
 
 
-"""Illustrate a time in a day, in the format HH:MM"""
 class Time:
+    """Illustrate a time in a day, in the format HH:MM"""
+
     def __init__(self, hour, minutes):
         if hour not in range(24) or minutes not in range(60):
             raise Exception("Invalid hour/minutes supplied")
