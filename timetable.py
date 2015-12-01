@@ -32,9 +32,9 @@ class Timetable:
                 class_ = dict(zip(CLASS_ROW_HEADERS, this_row))
 
                 # process the cells
-                class_["day"] = Weekday.from_string(class_["day"])
-                class_["start"] = Time.from_string(class_["start"])
-                class_["finish"] = Time.from_string(class_["finish"])
+                class_["day"] = Weekday.from_string(class_["day"]).to_num()
+                class_["start"] = Time.from_string(class_["start"]).to_tuple()
+                class_["finish"] = Time.from_string(class_["finish"]).to_tuple()
                 class_["class"] = dict(zip(CLASS_CODES,
                     class_["class"].split("/")))
 
@@ -69,6 +69,9 @@ class Time:
 
         return Time(hour, minutes)
 
+    def to_tuple(self):
+        return (self.hour, self.minutes)
+
 class Weekday:
     WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday",
         "saturday", "sunday"]
@@ -88,6 +91,10 @@ class Weekday:
                 % day_string)
 
         return Weekday(Weekday.WEEKDAYS.index(day_string.lower()))
+
+
+    def to_num(self):
+        return self.day_num
 
 
 def main():
