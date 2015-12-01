@@ -92,6 +92,7 @@ class Weekday:
 
 def main():
     timetable = Timetable()
+    from pprint import pprint
     pprint(timetable.read_subject(2016, "comp10001"))
     pprint(timetable.read_subject(2016, "comp10002"))
 
