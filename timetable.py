@@ -46,7 +46,7 @@ class Timetable:
                 else:
                     classes[semester].append(class_)
 
-        return classes
+        return (subject, classes)
 
 
 class Time:
@@ -69,8 +69,10 @@ class Time:
 
         return Time(hour, minutes)
 
+
     def to_tuple(self):
         return (self.hour, self.minutes)
+
 
 class Weekday:
     WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday",
