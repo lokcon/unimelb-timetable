@@ -2,78 +2,26 @@ from pprint import pprint
 from timetable import Timetable
 from subject_codes import SEMESTERS
 
-def choose_semester(subject_code, subject_classes):
-    """Prompt the user to choose a study period of a subject
-    Return the classes in that study period
-    """
 
-    # Prompt the user
-    print("%s has the following study periods:" % subject_code.upper())
-
-    options_dict = {}
-    for count, semester in enumerate(sorted(subject_classes.keys()), 1):
-        print("\t%d: %s (%s)"
-            % (count, SEMESTERS[semester], semester))
-
-        options_dict[count] = semester
-
-    # Construct a string of options e.g. "[1,2,3,4]"
-    options = range(1, len(subject_classes) + 1)
-    options_str = ""
-    for i in options:
-        options_str += "%s," % i
-    options_str = options_str[:-1]
-
-    # Ask the user
-    import sys
-    sys.stdout.write("Chose a study period [%s]: " % options_str)
-    try:
-        choosen_num = int(input())
-    except ValueError:
-        choosen_num = 1
-    else:
-        if choosen_num not in options:
-            print("Invalid option, defaults to option 1")
-            choosen_num = 1
-
-    return subject_classes[options_dict[choosen_num]]
-
-
-def fetch_timetables(year, subjects, debug = False):
-    if debug:
-        import test_data
-        return test_data.timetables
-
+def draw_timetable(subjects):
+    # Fetch timetables
     t = Timetable()
-    timetables = [t.read_subject(year, subject) for subject in subjects]
+    timetables = []
+    for year, semester, subject_code in subjects:
+        timetables.append(t.read_subject(year, semester, subject_code))
 
     print(timetables)
 
-    return timetables
-
-
-def draw_timetable(subject_codes, year = None):
-    if not year:
-        from datetime import date
-        year = date.today().year
-
-    # Fetch timetables
-    subject_timetables = fetch_timetables(year, subject_codes, debug = False)
-
     # Flatten clases from different subjects
-    classes = []
-    for subject_timetable in subject_timetables:
-        subject_code, subject_classes = subject_timetable
-        if len(subject_classes) > 1:
-            classes += choose_semester(subject_code, subject_classes)
-        else:
-            [(semester, subject_classes)] = subject_classes.items()
-            classes += subject_classes
+    all_classes = []
+    for timetable in timetables:
+        (year, semester, subject_code), classes = timetable
+        all_classes += classes
 
 
     # Calculate stacking of classes
     classes_by_day = {} # group classes by day
-    for class_ in classes:
+    for class_ in all_classes:
         classes_by_day.setdefault(class_["day"], []).append(class_)
 
     for day, classes_that_day in classes_by_day.items(): # process each weekday
@@ -109,9 +57,11 @@ def draw_timetable(subject_codes, year = None):
     finish = max([class_["finish"] for class_ in classes])
     plot(classes, start, finish)
 
+
 def time_to_float(time):
     (hour, minutes) = time
     return hour + minutes / 60
+
 
 def get_color(subject, colors):
     COLORS = ["salmon", "wheat", "lightgreen", "pink", "lightblue"]
@@ -192,8 +142,8 @@ def plot(classes, start, finish):
 
 
 def main():
-    subject_codes = ["abpl10003"]
-    draw_timetable(subject_codes)
+    subjects = [(2015, "SM1", "abpl10003")]
+    draw_timetable(subjects)
 
 if __name__ == "__main__":
     main()
