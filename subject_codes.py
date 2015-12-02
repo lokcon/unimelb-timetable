@@ -27,7 +27,7 @@ CLASS_TYPES = {
     "W" : "Workshop"
 }
 
-STUDY_PERIODS = {
+SEMESTERS = {
     "JAN": "January",
     "FEB": "February",
     "MAR": "March",

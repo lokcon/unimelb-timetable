@@ -1,8 +1,8 @@
 from pprint import pprint
 from timetable import Timetable
-from subject_codes import STUDY_PERIODS
+from subject_codes import SEMESTERS
 
-def choose_study_period(subject_code, subject_classes):
+def choose_semester(subject_code, subject_classes):
     """Prompt the user to choose a study period of a subject
     Return the classes in that study period
     """
@@ -11,11 +11,11 @@ def choose_study_period(subject_code, subject_classes):
     print("%s has the following study periods:" % subject_code.upper())
 
     options_dict = {}
-    for count, study_period in enumerate(sorted(subject_classes.keys()), 1):
+    for count, semester in enumerate(sorted(subject_classes.keys()), 1):
         print("\t%d: %s (%s)"
-            % (count, STUDY_PERIODS[study_period], study_period))
+            % (count, SEMESTERS[semester], semester))
 
-        options_dict[count] = study_period
+        options_dict[count] = semester
 
     # Construct a string of options e.g. "[1,2,3,4]"
     options = range(1, len(subject_classes) + 1)
@@ -65,9 +65,9 @@ def draw_timetable(subject_codes, year = None):
     for subject_timetable in subject_timetables:
         subject_code, subject_classes = subject_timetable
         if len(subject_classes) > 1:
-            classes += choose_study_period(subject_code, subject_classes)
+            classes += choose_semester(subject_code, subject_classes)
         else:
-            [(study_period, subject_classes)] = subject_classes.items()
+            [(semester, subject_classes)] = subject_classes.items()
             classes += subject_classes
 
 
