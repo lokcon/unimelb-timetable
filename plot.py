@@ -17,20 +17,22 @@ def _stack_classes(classes):
         for class_ in classes_that_day:
             start_index = intervals.index(class_["start"])
             finish_index = intervals.index(class_["finish"])
-            peak_level = max(intervals_count[start_index: finish_index])
 
-            class_["stacking"] = peak_level
+            max_level = max(intervals_count[index] for index in range(start_index, finish_index))
 
-            # increment stakcing level on the peark
+            class_["stacking"] = max_level
+
+            # add one more level
             for index in range(start_index, finish_index):
-                intervals_count[index] = peak_level + 1
+                intervals_count[index] = max_level + 1
+
 
         # retreive max stacking for each class
         for class_ in classes_that_day:
             start_index = intervals.index(class_["start"])
             finish_index = intervals.index(class_["finish"])
             class_["total_stacking"] = \
-                max(intervals_count[start_index: finish_index])
+                max(intervals_count[index] for index in range(start_index, finish_index))
 
     return classes
 
@@ -74,7 +76,8 @@ def _plot_matplot(classes, start, finish):
         # class information
         class_name = "%s/%s" % (class_["class"]["class_type"],
             class_["class"]["class_repeat"])
-        too_narrow = class_["total_stacking"] >= 4
+        too_narrow = len(class_name) * class_["total_stacking"] >= 19
+            # 19 is the tested magic number
 
         # Draw the square
         plt.fill_between(
