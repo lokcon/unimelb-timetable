@@ -47,6 +47,8 @@ def fetch_timetables(year, subjects, debug = False):
     t = Timetable()
     timetables = [t.read_subject(year, subject) for subject in subjects]
 
+    print(timetables)
+
     return timetables
 
 
@@ -56,7 +58,7 @@ def draw_timetable(subject_codes, year = None):
         year = date.today().year
 
     # Fetch timetables
-    subject_timetables = fetch_timetables(year, subject_codes, debug = True)
+    subject_timetables = fetch_timetables(year, subject_codes, debug = False)
 
     # Flatten clases from different subjects
     classes = []
@@ -93,8 +95,7 @@ def draw_timetable(subject_codes, year = None):
 
             # increment stakcing level on the peark
             for index in range(start_index, finish_index):
-                if intervals_count[index] == peak_level:
-                    intervals_count[index] += 1
+                intervals_count[index] = peak_level + 1
 
         # retreive max stacking for each class
         for class_ in classes_that_day:
@@ -113,7 +114,7 @@ def time_to_float(time):
     return hour + minutes / 60
 
 def get_color(subject, colors):
-    COLORS = ["lightblue", "lightgreen", "salmon", "wheat", "pink"]
+    COLORS = ["salmon", "wheat", "lightgreen", "pink", "lightblue"]
     if subject not in colors:
         colors[subject] = COLORS[len(colors)]
 
@@ -147,7 +148,7 @@ def plot(classes, start, finish):
 
         # Draw the square
         plt.fill_between(
-            [day_start, day_end - ITEM_MARGIN * 2],
+            [day_start, day_end - ITEM_MARGIN],
              start + ITEM_MARGIN,
              finish - ITEM_MARGIN,
             color = get_color(class_["class"]["subject"], colors),
@@ -176,7 +177,7 @@ def plot(classes, start, finish):
 
 
 def main():
-    subject_codes = ["comp20003"] #,"info20003", "mast20026"]
+    subject_codes = ["abpl10003"]
     draw_timetable(subject_codes)
 
 if __name__ == "__main__":
