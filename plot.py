@@ -1,3 +1,6 @@
+DEFAULT_OUTPUT_FORMAT = "svg"
+SUPPORTED_OUTPUT_FORMATS = ["svg", "png"]
+
 def _stack_classes(classes):
     # Calculate stacking of classes
     classes_by_day = {} # group classes by day
@@ -46,7 +49,7 @@ def _flatten_classes(subject_timetables):
     return all_classes
 
 
-def _plot_matplot(classes, start, finish):
+def _plot_matplot(classes, start, finish, format = DEFAULT_OUTPUT_FORMAT, show = False):
     import matplotlib.pyplot as plt
 
     TIME_MARGIN = 0.3
@@ -54,7 +57,7 @@ def _plot_matplot(classes, start, finish):
     Y_MARGIN = 0.025
 
     # Set axis
-    fig = plt.figure(figsize = (13, 10))
+    fig = plt.figure(figsize = (13, 10), facecolor = "white")
     subplot = fig.add_subplot(1,1,1)
 
     # Set grids
@@ -136,7 +139,20 @@ def _plot_matplot(classes, start, finish):
             ha = "center", va = "center",
             rotation = rotation)
 
-    plt.show()
+    if show:
+        plt.show()
+
+    # determine format
+    if format not in SUPPORTED_OUTPUT_FORMATS:
+        format = DEFAULT_OUTPUT_FORMAT # fallback to defaults
+
+    # Get the bytes of the png
+    import io
+    image = io.BytesIO()
+    fig.savefig(image, format = format)
+    image.seek(0)
+
+    return image.read()
 
 
 def _time_to_float(time):
@@ -165,7 +181,7 @@ def fetch_timetables(subjects):
     return subject_timetables
 
 
-def draw_timetable(subject_timetables):
+def draw_timetable(subject_timetables, format = DEFAULT_OUTPUT_FORMAT):
     # Flatten clases from different subjects
     all_classes = _flatten_classes(subject_timetables)
 
@@ -177,8 +193,8 @@ def draw_timetable(subject_timetables):
     lattest_finish = max([class_["finish"] for class_ in all_classes])
 
     # plot the timetable
-    _plot_matplot(all_classes, earliest_start, lattest_finish)
+    return _plot_matplot(all_classes, earliest_start, lattest_finish, format)
 
 
-def fetch_and_draw_timetable(subjects):
-    draw_timetable(fetch_timetables(subjects))
+def fetch_and_draw_timetable(subjects, format = DEFAULT_OUTPUT_FORMAT):
+    return draw_timetable(fetch_timetables(subjects), format)
