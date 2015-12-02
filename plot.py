@@ -1,6 +1,9 @@
 DEFAULT_OUTPUT_FORMAT = "svg"
 SUPPORTED_OUTPUT_FORMATS = ["svg", "png"]
 
+DEFAULT_WEEKDAYS = 5 # defaults to output Monday to Friday on timetable
+
+
 def _stack_classes(classes):
     # Calculate stacking of classes
     classes_by_day = {} # group classes by day
@@ -49,7 +52,8 @@ def _flatten_classes(subject_timetables):
     return all_classes
 
 
-def _plot_matplot(classes, start, finish, format = DEFAULT_OUTPUT_FORMAT, show = False):
+def _plot_matplot(classes, start, finish,
+format = DEFAULT_OUTPUT_FORMAT, show_plot = False):
     import matplotlib.pyplot as plt
 
     TIME_MARGIN = 0.3
@@ -139,7 +143,7 @@ def _plot_matplot(classes, start, finish, format = DEFAULT_OUTPUT_FORMAT, show =
             ha = "center", va = "center",
             rotation = rotation)
 
-    if show:
+    if show_plot:
         plt.show()
 
     # determine format
@@ -181,7 +185,8 @@ def fetch_timetables(subjects):
     return subject_timetables
 
 
-def draw_timetable(subject_timetables, format = DEFAULT_OUTPUT_FORMAT):
+def draw_timetable(subject_timetables,
+format = DEFAULT_OUTPUT_FORMAT, show_plot = False):
     # Flatten clases from different subjects
     all_classes = _flatten_classes(subject_timetables)
 
@@ -193,8 +198,10 @@ def draw_timetable(subject_timetables, format = DEFAULT_OUTPUT_FORMAT):
     lattest_finish = max([class_["finish"] for class_ in all_classes])
 
     # plot the timetable
-    return _plot_matplot(all_classes, earliest_start, lattest_finish, format)
+    return _plot_matplot(all_classes, earliest_start, lattest_finish,
+        format, show_plot)
 
 
-def fetch_and_draw_timetable(subjects, format = DEFAULT_OUTPUT_FORMAT):
-    return draw_timetable(fetch_timetables(subjects), format)
+def fetch_and_draw_timetable(subjects,
+format = DEFAULT_OUTPUT_FORMAT, show_plot = False):
+    return draw_timetable(fetch_timetables(subjects), format, show_plot)
