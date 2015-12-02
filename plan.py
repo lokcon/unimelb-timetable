@@ -3,25 +3,10 @@ from timetable import Timetable
 from subject_codes import SEMESTERS
 
 
-def draw_timetable(subjects):
-    # Fetch timetables
-    t = Timetable()
-    timetables = []
-    for year, semester, subject_code in subjects:
-        timetables.append(t.read_subject(year, semester, subject_code))
-
-    print(timetables)
-
-    # Flatten clases from different subjects
-    all_classes = []
-    for timetable in timetables:
-        (year, semester, subject_code), classes = timetable
-        all_classes += classes
-
-
+def stack_classes(classes):
     # Calculate stacking of classes
     classes_by_day = {} # group classes by day
-    for class_ in all_classes:
+    for class_ in classes:
         classes_by_day.setdefault(class_["day"], []).append(class_)
 
     for day, classes_that_day in classes_by_day.items(): # process each weekday
@@ -52,10 +37,39 @@ def draw_timetable(subjects):
             class_["total_stacking"] = \
                 max(intervals_count[start_index: finish_index])
 
+    return classes
 
-    start = min([class_["start"] for class_ in classes])
-    finish = max([class_["finish"] for class_ in classes])
-    plot(classes, start, finish)
+
+def flatten_classes(subject_timetables):
+    all_classes = []
+    for timetable in subject_timetables:
+        (year, semester, subject_code), classes = timetable
+        all_classes += classes
+
+    return all_classes
+
+
+def draw_timetable(subjects):
+    # Fetch timetables
+    t = Timetable()
+    subject_timetables = []
+    for year, semester, subject_code in subjects:
+        subject_timetables.append(t.read_subject(year, semester, subject_code))
+
+    print(subject_timetables)
+
+    # Flatten clases from different subjects
+    all_classes = flatten_classes(subject_timetables)
+
+    # calculate stacking width of clashing classes
+    all_classes = stack_classes(all_classes)
+
+    # calculate start and finish of timetable
+    earliest_start = min([class_["start"] for class_ in all_classes])
+    lattest_finish = max([class_["finish"] for class_ in all_classes])
+
+    # plot the timetable
+    plot_matplot(all_classes, earliest_start, lattest_finish)
 
 
 def time_to_float(time):
@@ -71,7 +85,7 @@ def get_color(subject, colors):
     return colors[subject]
 
 
-def plot(classes, start, finish):
+def plot_matplot(classes, start, finish):
     import matplotlib.pyplot as plt
 
     TIME_MARGIN = 0.2
