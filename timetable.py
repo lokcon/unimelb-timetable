@@ -14,7 +14,7 @@ class Timetable:
         return TIMETALBE_LINK % {"year": year, "subject": subject}
 
 
-    def read_subject(self, year, subject):
+    def read_subject(self, year, semester, subject):
         import requests
         from bs4 import BeautifulSoup
 
@@ -22,7 +22,7 @@ class Timetable:
         page = requests.get(url)
         soup = BeautifulSoup(page.content)
 
-        classes = {}
+        classes = []
         for table in soup.find_all("table", class_ = "cyon_table"):
             for row in table.find("tbody").find_all("tr"):
                 cells = row.find_all("td")
@@ -38,15 +38,11 @@ class Timetable:
                 class_["class"] = dict(zip(CLASS_CODES,
                     class_["class"].split("/")))
 
+                # filter classes by semester
+                if semester == class_["class"]["semester"]:
+                    classes.append(class_)
 
-                # group classes by semester
-                semester = class_["class"]["semester"]
-                if semester not in classes:
-                    classes[semester] = [class_]
-                else:
-                    classes[semester].append(class_)
-
-        return (subject, classes)
+        return ((year, semester, subject), classes)
 
 
 class Time:
@@ -97,14 +93,3 @@ class Weekday:
 
     def to_num(self):
         return self.day_num
-
-
-def main():
-    timetable = Timetable()
-    from pprint import pprint
-    pprint(timetable.read_subject(2016, "comp10001"))
-    pprint(timetable.read_subject(2016, "comp10002"))
-
-
-if __name__ == "__main__":
-    main()
