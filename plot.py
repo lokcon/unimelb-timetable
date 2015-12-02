@@ -49,19 +49,44 @@ def _flatten_classes(subject_timetables):
 def _plot_matplot(classes, start, finish):
     import matplotlib.pyplot as plt
 
-    TIME_MARGIN = 0.2
-    ITEM_MARGIN = 0.02
+    TIME_MARGIN = 0.3
+    X_MARGIN = 0.015
+    Y_MARGIN = 0.025
 
     # Set axis
     fig = plt.figure(figsize = (13, 10))
     subplot = fig.add_subplot(1,1,1)
-    subplot.yaxis.grid(which = "both")
+
+    # Set grids
+    subplot.xaxis.grid(which = "major", alpha = 0)
+    subplot.xaxis.grid(which = "minor", alpha = 0.85)
+    subplot.yaxis.grid(which = "major", alpha = 0.85)
+    subplot.yaxis.grid(which = "minor", alpha = 0.3)
+
+    # Set limits of axes
     subplot.set_xlim(0.5, 5 + 0.5)
     subplot.set_ylim(_time_to_float(finish) + TIME_MARGIN,
         _time_to_float(start) - TIME_MARGIN)
-    subplot.set_xticks(range(1,5+1))
-    subplot.set_xticklabels(["Monday","Tuesday","Wednesday","Thursday", "Friday"])
+
+    # Set labels of axes
+    subplot.set_xlabel("Day")
+    subplot.set_xticklabels(
+        ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])
     subplot.set_ylabel('Time')
+    subplot.set_yticklabels(
+        ["%d:00" % i for i in
+            range(_time_to_int(start), _time_to_int(finish) + 1)])
+
+    # Set x ticks
+    subplot.set_xticks(range(1, 5 + 1))
+    subplot.set_xticks([i + 0.5 for i in range(1, 5 + 1)], minor = True)
+
+    # Set y ticks
+    subplot.set_yticks(range(_time_to_int(start), _time_to_int(finish) + 1))
+    subplot.set_yticks(
+        [i / 4 for i in
+            range(_time_to_int(start) * 4, (_time_to_int(finish) + 1) * 4)],
+        minor = True)
 
     colors = {}
     for class_ in classes:
@@ -81,22 +106,20 @@ def _plot_matplot(classes, start, finish):
 
         # Draw the square
         plt.fill_between(
-            [day_start, day_end - ITEM_MARGIN],
-             start + ITEM_MARGIN,
-             finish - ITEM_MARGIN,
-            color = _get_color(class_["class"]["subject"], colors),
-            edgecolor = "k",
-            linewidth = 0.5)
+            [day_start + X_MARGIN, day_end - X_MARGIN],
+             start + Y_MARGIN,
+             finish - Y_MARGIN,
+            color = _get_color(class_["class"]["subject"], colors))
 
         if not too_narrow:
             # Draw starting time
-            plt.text(day_start + ITEM_MARGIN * 2,
-                start + ITEM_MARGIN * 5,
+            plt.text(day_start + X_MARGIN * 2,
+                start + Y_MARGIN * 4,
                 "%d:%02d" % class_["start"],
                 fontsize = 8, va = "top")
             # Draw finishing time
-            plt.text(day_start + ITEM_MARGIN * 2,
-                finish - ITEM_MARGIN * 5,
+            plt.text(day_start + X_MARGIN * 2,
+                finish - Y_MARGIN * 4,
                 "%d:%02d" % class_["finish"],
                 fontsize = 8, va = "bottom")
 
@@ -119,6 +142,9 @@ def _plot_matplot(classes, start, finish):
 def _time_to_float(time):
     (hour, minutes) = time
     return hour + minutes / 60
+
+def _time_to_int(time):
+    return int(_time_to_float(time))
 
 
 def _get_color(subject, colors):
