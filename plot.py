@@ -1,8 +1,3 @@
-from pprint import pprint
-from timetable import Timetable
-from subject_codes import SEMESTERS
-
-
 def stack_classes(classes):
     # Calculate stacking of classes
     classes_by_day = {} # group classes by day
@@ -49,15 +44,17 @@ def flatten_classes(subject_timetables):
     return all_classes
 
 
-def draw_timetable(subjects):
-    # Fetch timetables
+def fetch_timetables(subjects):
+    from timetable import Timetable
     t = Timetable()
     subject_timetables = []
     for year, semester, subject_code in subjects:
         subject_timetables.append(t.read_subject(year, semester, subject_code))
 
-    print(subject_timetables)
+    return subject_timetables
 
+
+def draw_timetable(subject_timetables):
     # Flatten clases from different subjects
     all_classes = flatten_classes(subject_timetables)
 
@@ -70,6 +67,10 @@ def draw_timetable(subjects):
 
     # plot the timetable
     plot_matplot(all_classes, earliest_start, lattest_finish)
+
+
+def fetch_and_draw_timetable(subjects):
+    draw_timetable(fetch_timetables(subjects))
 
 
 def time_to_float(time):
