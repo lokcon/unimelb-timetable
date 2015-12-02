@@ -46,10 +46,10 @@ def flatten_classes(subject_timetables):
 
 def fetch_timetables(subjects):
     from timetable import Timetable
-    t = Timetable()
     subject_timetables = []
     for year, semester, subject_code in subjects:
-        subject_timetables.append(t.read_subject(year, semester, subject_code))
+        subject_timetables.append(
+            Timetable.read_subject(year, semester, subject_code))
 
     return subject_timetables
 

@@ -10,15 +10,17 @@ TIMETALBE_LINK = ("https://sws.unimelb.edu.au/%(year)s/Reports/List.aspx"
 class Timetable:
     """A scraper for the timetable of a subject"""
 
-    def __timetable_link(self, year, subject):
+    @staticmethod
+    def __timetable_link(year, subject):
         return TIMETALBE_LINK % {"year": year, "subject": subject}
 
 
-    def read_subject(self, year, semester, subject):
+    @staticmethod
+    def read_subject(year, semester, subject):
         import requests
         from bs4 import BeautifulSoup
 
-        url = self.__timetable_link(year, subject)
+        url = Timetable.__timetable_link(year, subject)
         page = requests.get(url)
         soup = BeautifulSoup(page.content)
 
