@@ -128,7 +128,7 @@ def plot(classes, start, finish):
     ITEM_MARGIN = 0.02
 
     # Set axis
-    fig = plt.figure(figsize = (10, 10))
+    fig = plt.figure(figsize = (13, 10))
     subplot = fig.add_subplot(1,1,1)
     subplot.yaxis.grid(which = "both")
     subplot.set_xlim(0.5, 5 + 0.5)
@@ -140,11 +140,18 @@ def plot(classes, start, finish):
 
     colors = {}
     for class_ in classes:
+        # x-coordinates
         day = class_["day"] + 1
         day_start = (day - 0.5) + class_["stacking"] / class_["total_stacking"]
         day_end = day_start + 1 / class_["total_stacking"]
+        # y-coordinates
         start = time_to_float(class_["start"])
         finish = time_to_float(class_["finish"])
+
+        # class information
+        class_name = "%s/%s" % (class_["class"]["class_type"],
+            class_["class"]["class_repeat"])
+        too_narrow = class_["total_stacking"] >= 4
 
         # Draw the square
         plt.fill_between(
@@ -154,23 +161,31 @@ def plot(classes, start, finish):
             color = get_color(class_["class"]["subject"], colors),
             edgecolor = "k",
             linewidth = 0.5)
-        # Draw starting time
-        plt.text(day_start + ITEM_MARGIN * 2,
-            start + ITEM_MARGIN * 5,
-            "%d:%02d" % class_["start"],
-            fontsize = 8, va = "top")
-        # Draw finishing time
-        plt.text(day_start + ITEM_MARGIN * 2,
-            finish - ITEM_MARGIN * 5,
-            "%d:%02d" % class_["finish"],
-            fontsize = 8, va = "bottom")
+
+        if not too_narrow:
+            # Draw starting time
+            plt.text(day_start + ITEM_MARGIN * 2,
+                start + ITEM_MARGIN * 5,
+                "%d:%02d" % class_["start"],
+                fontsize = 8, va = "top")
+            # Draw finishing time
+            plt.text(day_start + ITEM_MARGIN * 2,
+                finish - ITEM_MARGIN * 5,
+                "%d:%02d" % class_["finish"],
+                fontsize = 8, va = "bottom")
+
         # Draw class name
+        if too_narrow:
+            rotation = 270
+        else:
+            rotation = 0
+
         plt.text((day_start + day_end) / 2,
             (start + finish) / 2,
-            "%s/%s" % (class_["class"]["class_type"],
-                class_["class"]["class_repeat"]),
+            class_name,
             fontsize = 10,
-            ha = "center", va = "center")
+            ha = "center", va = "center",
+            rotation = rotation)
 
     plt.show()
 
