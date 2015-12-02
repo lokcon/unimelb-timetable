@@ -152,12 +152,3 @@ def plot_matplot(classes, start, finish):
             rotation = rotation)
 
     plt.show()
-
-
-
-def main():
-    subjects = [(2015, "SM1", "abpl10003")]
-    draw_timetable(subjects)
-
-if __name__ == "__main__":
-    main()
