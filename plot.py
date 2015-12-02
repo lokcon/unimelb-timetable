@@ -1,8 +1,6 @@
 DEFAULT_OUTPUT_FORMAT = "svg"
 SUPPORTED_OUTPUT_FORMATS = ["svg", "png"]
 
-DEFAULT_WEEKDAYS = 5 # defaults to output Monday to Friday on timetable
-
 
 def _stack_classes(classes):
     # Calculate stacking of classes
@@ -52,9 +50,10 @@ def _flatten_classes(subject_timetables):
     return all_classes
 
 
-def _plot_matplot(classes, start, finish,
+def _plot_matplot(classes, start, finish, number_of_days,
 format = DEFAULT_OUTPUT_FORMAT, show_plot = False):
     import matplotlib.pyplot as plt
+    from timetable import Weekday
 
     TIME_MARGIN = 0.3
     X_MARGIN = 0.015
@@ -71,22 +70,23 @@ format = DEFAULT_OUTPUT_FORMAT, show_plot = False):
     subplot.yaxis.grid(which = "minor", alpha = 0.3)
 
     # Set limits of axes
-    subplot.set_xlim(0.5, 5 + 0.5)
+    subplot.set_xlim(0.5, number_of_days + 0.5)
     subplot.set_ylim(_time_to_float(finish) + TIME_MARGIN,
         _time_to_float(start) - TIME_MARGIN)
 
     # Set labels of axes
     subplot.set_xlabel("Day")
     subplot.set_xticklabels(
-        ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])
+        [label.title() for label in Weekday.WEEKDAYS[:number_of_days]])
     subplot.set_ylabel('Time')
     subplot.set_yticklabels(
         ["%d:00" % i for i in
             range(_time_to_int(start), _time_to_int(finish) + 1)])
 
     # Set x ticks
-    subplot.set_xticks(range(1, 5 + 1))
-    subplot.set_xticks([i + 0.5 for i in range(1, 5 + 1)], minor = True)
+    subplot.set_xticks(range(1, number_of_days + 1))
+    subplot.set_xticks([i + 0.5 for i in range(1, number_of_days + 1)],
+        minor = True)
 
     # Set y ticks
     subplot.set_yticks(range(_time_to_int(start), _time_to_int(finish) + 1))
@@ -197,8 +197,15 @@ format = DEFAULT_OUTPUT_FORMAT, show_plot = False):
     earliest_start = min([class_["start"] for class_ in all_classes])
     lattest_finish = max([class_["finish"] for class_ in all_classes])
 
+    # determine if to include saturday and sunday in plot
+    if True in [class_["day"] >= 5 for class_ in all_classes]:
+        number_of_days = 7
+    else:
+        number_of_days = 5
+
     # plot the timetable
-    return _plot_matplot(all_classes, earliest_start, lattest_finish,
+    return _plot_matplot(all_classes,
+        earliest_start, lattest_finish, number_of_days,
         format, show_plot)
 
 
