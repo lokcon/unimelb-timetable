@@ -44,7 +44,7 @@ class Timetable:
                 if semester == class_["class"]["semester"]:
                     classes.append(class_)
 
-        return ((year, semester, subject), classes)
+        return ((year, semester.upper(), subject.upper()), classes)
 
 
 class Time:
