@@ -1,3 +1,7 @@
+"""
+A script for plotting for a timetable of selected subjects.
+"""
+
 DEFAULT_OUTPUT_FORMAT = "svg"
 SUPPORTED_OUTPUT_FORMATS = ["svg", "png"]
 

@@ -1,3 +1,7 @@
+"""
+The scraper for the Uniemlb timetable
+"""
+
 CLASS_ROW_HEADERS = ["class", "description", "day", "start", "finish",
     "duration", "weeks", "location", "date", "start_date"]
 CLASS_CODES = ["subject", "campus", "num", "semester", "class_type",
