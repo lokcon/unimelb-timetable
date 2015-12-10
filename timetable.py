@@ -53,7 +53,7 @@ class Timetable:
 
     @staticmethod
     def get(year, semester, subject):
-        return Timetable.read_subject(year, semester, subject)
+        return Timetable.__read_subject(year, semester, subject)
 
 
 class Time:
