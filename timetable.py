@@ -20,7 +20,7 @@ class Timetable:
 
 
     @staticmethod
-    def read_subject(year, semester, subject):
+    def __read_subject(year, semester, subject):
         import requests
         from bs4 import BeautifulSoup
 
@@ -49,6 +49,11 @@ class Timetable:
                     classes.append(class_)
 
         return ((year, semester.upper(), subject.upper()), classes)
+
+
+    @staticmethod
+    def get(year, semester, subject):
+        return Timetable.read_subject(year, semester, subject)
 
 
 class Time:
