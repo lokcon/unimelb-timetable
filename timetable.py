@@ -45,7 +45,7 @@ class Timetable:
                     class_["class"].split("/")))
 
                 # filter classes by semester
-                if semester == class_["class"]["semester"]:
+                if semester.upper() == class_["class"]["semester"].upper():
                     classes.append(class_)
 
         return ((year, semester.upper(), subject.upper()), classes)
