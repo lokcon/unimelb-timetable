@@ -26,7 +26,7 @@ class Timetable:
 
         url = Timetable.__timetable_link(year, subject)
         page = requests.get(url)
-        soup = BeautifulSoup(page.content)
+        soup = BeautifulSoup(page.content, "html.parser")
 
         classes = []
         for table in soup.find_all("table", class_ = "cyon_table"):
