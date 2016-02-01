@@ -184,7 +184,7 @@ def fetch_timetables(subjects):
     subject_timetables = []
     for year, semester, subject_code in subjects:
         subject_timetables.append(
-            Timetable.read_subject(year, semester, subject_code))
+            Timetable.get(year, semester, subject_code))
 
     return subject_timetables
 
